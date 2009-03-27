@@ -4,6 +4,11 @@
 #include <stdio.h>
 #include <libdsmi.h>
 
+/*
+	jancukcontroller 0.1
+	author: iyok@deadmediafm.org
+	url: http://www.github.com/badgeek
+*/
 
 u16 *main_vram = NULL;	// main display memory
 touchPosition touch; 	// touchpad
