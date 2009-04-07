@@ -1,5 +1,5 @@
 #include <nds.h>
-#include <string.h> 
+#include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <libdsmi.h>
@@ -8,6 +8,13 @@
 	jancukcontroller 0.1
 	author: iyok@deadmediafm.org
 	url: http://www.github.com/badgeek
+
+	todo:
+
+        *clean up/reorganize code
+        *refactor
+        *fix bug
+
 */
 
 u16 *main_vram = NULL;	// main display memory
@@ -21,7 +28,7 @@ class Button
 	public:
 		char *name;
 		bool toggle;
-		int id;		
+		int id;
 		int curvalue;
 		int x;
 		int y;
@@ -32,40 +39,40 @@ class Button
 		toggle = false;
 		curvalue = 0;
 	}
-	
-	
+
+
 	void button_up()
 	{
 	  u16 i;
-	  
-	    //clear dulu
-	
 
-		
+	    //clear dulu
+
+
+
 		//border atas bawah
-	
+
 		for(i = 0; i < width; i++)
 		{
 			main_vram[((x+i)+y*256)] = RGB15(31,0,0) | BIT(15);
 			main_vram[((x+i)+(y+height)*256)] = RGB15(31,0,0) | BIT(15);
 		}
-	
+
 		// border kiri dan kanan
-	
+
 		for(i = 0; i < height; i++)
 		{
 			main_vram[((x)+(y+i)*256)] = RGB15(31,0,0) | BIT(15);
 			main_vram[((x+width)+(y+i)*256)] = RGB15(31,0,0) | BIT(15);
 		}
-	
+
 	}
-	
+
 	void button_down()
 	{
 	  u16 i;
 	  u16 j;
 	    //border atas dan bawah
-	  
+
 		for(i = 0; i < width; i++)
 		{
 		   for(j = 0; j < height; j++)
@@ -74,7 +81,7 @@ class Button
 	       }
 		 }
 	}
-	
+
 	void button_clear()
 	{
 	  u16 i;
@@ -85,20 +92,20 @@ class Button
 		   {
 		    	main_vram[((x+i)+(y+j)*256)] = RGB15(0,0,0) | BIT(15);
 	       }
-		 
+
 		}
 	}
-	
+
 	void draw()
 	{
 		button_up();
 	}
-	
+
 	void update()
 	{
 
 		char* testOSC = "test";
-		
+
 		if (touch.px >= x &&  touch.px <= (x+width))
 		{
 			if (touch.py >= y && touch.py <= (y+height))
@@ -116,7 +123,7 @@ class Button
 
 			}
 		}
-		
+
 		if (keysUp() & KEY_TOUCH && curvalue == 1)
 		{
 			curvalue = 0;
@@ -126,10 +133,10 @@ class Button
 			dsmi_osc_addintarg(curvalue);
 			dsmi_osc_send();
 			button_clear();
-			button_up();			
+			button_up();
 		}
-		
-		
+
+
 	}
 };
 
@@ -140,7 +147,7 @@ class Kaosspad
 {
 	public:
 		char *name;
-		int id;		
+		int id;
 		int curvalue;
 		int x;
 		int y;
@@ -150,33 +157,33 @@ class Kaosspad
 	void draw()
 	{
 	  u16 i;
-	  
+
 	    //border atas dan bawah
-	  
+
 		for(i = 0; i < width; i++)
 		{
 			main_vram[((x+i)+y*256)] = RGB15(31,0,0) | BIT(15);
 			main_vram[((x+i)+(y+height)*256)] = RGB15(31,0,0) | BIT(15);
 		}
-	
+
 		// border kiri dan kanan
-	
+
 		for(i = 0; i < height; i++)
 		{
 			main_vram[((x)+(y+i)*256)] = RGB15(31,0,0) | BIT(15);
 			main_vram[((x+width)+(y+i)*256)] = RGB15(31,0,0) | BIT(15);
 		}
-	
+
 	}
-	
+
 	void update()
 	{
 		int centerX;
 		int centerY;
-		
+
 		centerX = width/2;
 		centerY = height/2;
-		
+
 		if (touch.px >= x &&  touch.px <= (x+width))
 		{
 			if (touch.py >= y && touch.py <= (y+height))
@@ -190,11 +197,11 @@ class Kaosspad
 				dsmi_osc_addintarg(touch.px-(centerX+x));
 				dsmi_osc_addintarg((centerY+y)-touch.py);
 				dsmi_osc_send();
-				
+
 			}
 		}
-		
-		
+
+
 	}
 };
 
@@ -214,35 +221,35 @@ class Vslider
 	void draw()
 	{
 	  u16 i;
-	  
+
 	    //border atas dan bawah
-	  
+
 		for(i = 0; i < width; i++)
 		{
 			main_vram[((x+i)+y*256)] = RGB15(31,0,0) | BIT(15);
 			main_vram[((x+i)+(y+height)*256)] = RGB15(31,0,0) | BIT(15);
 		}
-	
+
 		// border kiri dan kanan
-	
+
 		for(i = 0; i < height; i++)
 		{
 			main_vram[((x)+(y+i)*256)] = RGB15(31,0,0) | BIT(15);
 			main_vram[((x+width)+(y+i)*256)] = RGB15(31,0,0) | BIT(15);
 		}
-	
+
 	}
-	
+
 	void setOscName(char * OscName)
 	{
 		name = OscName;
 	}
-	
+
 	void update()
 	{
 		u16 i;
 		bool touchOver;
-		
+
 		if (touch.px >= x &&  touch.px <= (x+width))
 		{
 			if (touch.py >= y && touch.py <= (y+height))
@@ -255,45 +262,45 @@ class Vslider
 
 		if (touchOver && keysHeld() & KEY_TOUCH)
 		{
-		
+
 				for(i = 1; i < width-1; i++)
 				{
 					if (curvalue != y && curvalue != y+height)
 					{
 						main_vram[((x+i)+(curvalue)*256)] = RGB15(0,0,0) | BIT(15);
-					}					
+					}
 				}
-		
-		
+
+
 		if (curvalue != touch.py){
-			
+
 			curvalue = touch.py;
 			char* testOSC = "test";
 			testOSC = "";
-			sprintf(testOSC, "%s/%d", name, id );				
+			sprintf(testOSC, "%s/%d", name, id );
 			dsmi_osc_new(testOSC);
 			dsmi_osc_addintarg(height-(touch.py-y));
 			dsmi_osc_send();
 			iprintf("\x1b[10;0HTouch name = %s\n", testOSC);
-			
+
 			for(i = 1; i < width-1; i++)
 			{
 				main_vram[((x+i)+(touch.py)*256)] = RGB15(31,0,0) | BIT(15);
-			}			
-						
-		}
-		
+			}
 
-				
-				
+		}
+
+
+
+
 		}else{
 				for(i = 1; i < width-1; i++)
 				{
 					main_vram[((x+i)+(curvalue)*256)] = RGB15(31,0,0) | BIT(15);
 				}
-		
+
 		}
-		
+
 	}
 };
 
@@ -303,7 +310,7 @@ class Hslider
 {
 	public:
 		char *name;
-		int id;		
+		int id;
 		int curvalue;
 		int x;
 		int y;
@@ -311,34 +318,34 @@ class Hslider
 		int height;
 		//char* name;
 
-	
+
 	void draw()
 	{
 	  u16 i;
-	  
+
 	    //border atas dan bawah
-	  
+
 		for(i = 0; i < width; i++)
 		{
 			main_vram[((x+i)+y*256)] = RGB15(31,0,0) | BIT(15);
 			main_vram[((x+i)+(y+height)*256)] = RGB15(31,0,0) | BIT(15);
 		}
-	
+
 		// border kiri dan kanan
-	
+
 		for(i = 0; i < height; i++)
 		{
 			main_vram[((x)+(y+i)*256)] = RGB15(31,0,0) | BIT(15);
 			main_vram[((x+width)+(y+i)*256)] = RGB15(31,0,0) | BIT(15);
 		}
-	
+
 	}
-	
+
 	void update()
 	{
 		u16 i;
 		bool touchOver;
-		
+
 		if (touch.px >= x &&  touch.px <= (x+width))
 		{
 			if (touch.py >= y && touch.py <= (y+height))
@@ -351,18 +358,18 @@ class Hslider
 
 		if (touchOver)
 		{
-		
+
 				for(i = 1; i < height-1; i++)
 				{
 					if (curvalue != x && curvalue != x+width)
 					{
 						main_vram[((curvalue)+(y+i)*256)] = RGB15(0,0,0) | BIT(15);
-					}					
+					}
 				}
-		
-		
+
+
 				if (curvalue != touch.px){
-		
+
 					curvalue = touch.px;
 					char* testOSC = "test";
 					testOSC = "";
@@ -371,22 +378,22 @@ class Hslider
 			    	dsmi_osc_addintarg(width-(touch.px-x));
 			    	dsmi_osc_send();
 					iprintf("\x1b[10;0HTouch name = %s\n", testOSC);
-		
+
 					for(i = 1; i < height-1; i++)
 					{
 						main_vram[((touch.px)+(y+i)*256)] = RGB15(31,0,0) | BIT(15);
 					}
-									
+
 				}
-				
+
 		}else{
 				for(i = 1; i < height-1; i++)
 				{
 					main_vram[((curvalue)+(y+i)*256)] = RGB15(31,0,0) | BIT(15);
 				}
-		
+
 		}
-		
+
 	}
 };
 
@@ -403,7 +410,7 @@ void handlePad()
 
 		scanKeys();
 		keysdown = keysDown();
-		
+
 		if (keysdown & KEY_L)
 		{
 			controlIndex--;
@@ -417,7 +424,7 @@ void handlePad()
 
 		if (controlIndex<0) controlIndex=2;
 		if (controlIndex>2) controlIndex=0;
-		
+
 
 		touchRead(&touch);
 }
@@ -474,19 +481,19 @@ int main(void) {
 //---------------------------------------------------------------------------------
 
 	//set video mode to mode 5 with background 3 enabled
-	videoSetMode(MODE_5_2D);	
+	videoSetMode(MODE_5_2D);
 	videoSetModeSub(MODE_0_2D);
-	
+
 	//map vram a to start of background graphics memory
 	vramSetMainBanks(VRAM_A_MAIN_BG_0x06000000, VRAM_B_MAIN_BG_0x06020000,
 		VRAM_C_SUB_BG_0x06200000 , VRAM_D_LCD);
-		
+
 	//console printing
-	
+
 	PrintConsole topScreen = *consoleInit(0, 3,BgType_Text4bpp, BgSize_T_256x256, 31, 0, false);
 	consoleSelect(&topScreen);
-	
-	
+
+
 	//BG drawing
 
 	int main_bg = bgInit(2, BgType_Bmp16, BgSize_B16_256x256, 2, 0);
@@ -498,34 +505,34 @@ int main(void) {
 
 	//int sub_bg = bgInitSub(2, BgType_Bmp16, BgSize_B16_256x256, 2, 0);
 	//bgSetPriority(sub_bg, 1);
-	
+
 	//main display is the touchscreen
 	lcdMainOnBottom();
-	
+
 	//libdsmi
-	
+
 	iprintf("\x1b[15;0H\x1b[KConnecting\n");
 	int res = dsmi_connect_wifi();
-	
+
 	if(res == 1) {
 		iprintf("\x1b[15;0H\x1b[KOK\n");
 	} else {
 		iprintf("\x1b[15;0H\x1b[KOh no, could not connect!\n");
 	}
-	
+
 	// control init
-	
+
 	initControl1();
 	drawControl1();
-	
+
 	initControl2();
 	initControl3();
 	//drawControl2();
-	
+
 	while(1) {
 		handlePad();
-		
-		
+
+
 		switch(controlIndex){
 			case 0:
 				if (swap == true){clear_vram();drawControl1();swap=false;}
@@ -538,12 +545,12 @@ int main(void) {
 			case 2:
 				if (swap == true){clear_vram();drawControl3();swap=false;}
 				handleControl3();
-			break;	
+			break;
 		}
 		swiWaitForVBlank();
 	}
-	
-	
+
+
 	return 0;
 }
 
@@ -554,8 +561,8 @@ void initControl1()
 	int i;
 	int offset = 0;
 	int row = 0;
-	
-	
+
+
 	for(i = 0; i < slidercnt; i++)
 	{
 			slider[i].id = i;
@@ -567,8 +574,8 @@ void initControl1()
 			slider[i].curvalue = slider[i].y + slider[i].height;
 			offset = offset + 30;
 	}
-	
-	
+
+
 	Hslider1.id = 1;
 	Hslider1.name = "/preset1/Hslider";
 	Hslider1.x = 10;
@@ -577,9 +584,9 @@ void initControl1()
 	Hslider1.height = 20;
 	Hslider1.curvalue = 10;
 	//strcpy(Hslider1.name, "/ds/preset1/Hslider1");
-	
+
 	offset = 0;
-	
+
 	for (i = 0; i < buttoncnt ; i++)
 	{
 		if (i % 4 == 0 && i != 0) { row = row + 30; offset = 0;}
@@ -590,7 +597,7 @@ void initControl1()
 		smallButton[i].width =  20;
 		smallButton[i].height = 20;
 		offset = offset + 30;
-		//strcpy(Kaoss1.name, "/ds/preset1/Kaoss1");		
+		//strcpy(Kaoss1.name, "/ds/preset1/Kaoss1");
 	}
 
 }
@@ -598,8 +605,8 @@ void initControl1()
 void drawControl1()
 {
 	int i;
-	for(i = 0; i < slidercnt; i++){slider[i].draw();}	
-	for(i = 0; i < buttoncnt; i++){smallButton[i].draw();}	
+	for(i = 0; i < slidercnt; i++){slider[i].draw();}
+	for(i = 0; i < buttoncnt; i++){smallButton[i].draw();}
 	Hslider1.draw();
 	//Kaoss1.draw();
 	//Button1.draw();
@@ -610,7 +617,7 @@ void handleControl1()
 int i;
 
 	for(i = 0; i < slidercnt; i++){slider[i].update();}
-	for(i = 0; i < buttoncnt; i++){smallButton[i].update();}	
+	for(i = 0; i < buttoncnt; i++){smallButton[i].update();}
 	Hslider1.update();
 //	Kaoss1.update();
 //	Button1.update();
@@ -622,7 +629,7 @@ void initControl2()
 {
 	int i;
 	int offset = 0;
-		
+
 	for(i = 0; i < 8; i++)
 	{
 			slider2[i].id 		= i;
@@ -633,8 +640,8 @@ void initControl2()
 			slider2[i].height	= 170;
 			slider2[i].curvalue	= slider2[i].y + slider2[i].height;
 			offset = offset + 30;
-	}	
-	  
+	}
+
 }
 
 void drawControl2()
@@ -659,7 +666,7 @@ void initControl3()
 	Kaoss3.x = 5;
 	Kaoss3.y = 5;
 	Kaoss3.width =  240;
-	Kaoss3.height = 180;	
+	Kaoss3.height = 180;
 }
 
 void drawControl3()
