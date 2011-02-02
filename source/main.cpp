@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <libdsmi.h>
+#include "drunkenlogo.h"
 
 /*
 	jancukcontroller 0.1
@@ -153,7 +154,17 @@ class Kaosspad
 		int y;
 		int width;
 		int height;
+		int oldx;
+		int oldy;
 		//char* name;
+		//
+	
+	Kaosspad()
+	{
+		oldx = 0;
+		oldy = 0;
+	}
+
 	void draw()
 	{
 	  u16 i;
@@ -180,28 +191,52 @@ class Kaosspad
 	{
 		int centerX;
 		int centerY;
-
+		int state; //touch state 1 = on touch 
+		
 		centerX = width/2;
 		centerY = height/2;
+
+		if (oldx >= x &&  oldx <= (x+width))
+		{
+			if (oldy >= y && oldy <= (y+height))
+			{
+
+				if (keysUp() & KEY_TOUCH)
+				{
+					char* testOSC = "test";
+					testOSC = "";
+					sprintf(testOSC, "%s/%d/pos", name, id );					
+					dsmi_osc_new(testOSC);
+					dsmi_osc_addintarg(oldx-(centerX+x));
+					dsmi_osc_addintarg((centerY+y)-oldy);
+					dsmi_osc_addintarg(0);
+					dsmi_osc_send();
+				}
+			}
+		}
+
 
 		if (touch.px >= x &&  touch.px <= (x+width))
 		{
 			if (touch.py >= y && touch.py <= (y+height))
 			{
+
 				char* testOSC = "test";
 				testOSC = "";
-				sprintf(testOSC, "%s/%d", name, id );
+				sprintf(testOSC, "%s/%d/pos", name, id );
 				iprintf("\x1b[10;0HTouch name = %s\n", testOSC);
 				iprintf("\x1b[10;0HTouch x = %04i, y = %04i\n", touch.px-(centerX+x), (centerY+y)-touch.py);
 				dsmi_osc_new(testOSC);
 				dsmi_osc_addintarg(touch.px-(centerX+x));
 				dsmi_osc_addintarg((centerY+y)-touch.py);
+				dsmi_osc_addintarg(1);
 				dsmi_osc_send();
 
 			}
 		}
 
-
+		oldx = touch.px;
+		oldy = touch.py;
 	}
 };
 
@@ -421,6 +456,28 @@ void handlePad()
 			controlIndex++;
 			swap = true;
 		}
+		
+		if(keysDown() & KEY_RIGHT)
+		{
+			char* testOSC;
+			//testOSC = "";
+			sprintf(testOSC, "/nds/right");
+			dsmi_osc_new(testOSC);
+			dsmi_osc_addintarg(1);
+			dsmi_osc_send();
+		}
+		else if(keysUp() & KEY_RIGHT)
+		{
+			char* testOSC;
+			//testOSC = "";
+			sprintf(testOSC, "/nds/right");
+			dsmi_osc_new(testOSC);
+			dsmi_osc_addintarg(0);
+			dsmi_osc_send();
+		}
+
+
+		 
 
 		if (controlIndex<0) controlIndex=2;
 		if (controlIndex>2) controlIndex=0;
@@ -482,20 +539,23 @@ int main(void) {
 
 	//set video mode to mode 5 with background 3 enabled
 	videoSetMode(MODE_5_2D);
-	videoSetModeSub(MODE_0_2D);
+	videoSetModeSub(MODE_5_2D);
 
 	//map vram a to start of background graphics memory
 	vramSetMainBanks(VRAM_A_MAIN_BG_0x06000000, VRAM_B_MAIN_BG_0x06020000,
 		VRAM_C_SUB_BG_0x06200000 , VRAM_D_LCD);
 
-	//console printing
-
-	PrintConsole topScreen = *consoleInit(0, 3,BgType_Text4bpp, BgSize_T_256x256, 31, 0, false);
-	consoleSelect(&topScreen);
-
-
+	//sub console printing
+	PrintConsole *topScreen = consoleInit(0, 1, BgType_Text4bpp, BgSize_T_256x256, 31, 0, false, true);
+	bgSetPriority(topScreen->bgId, 0);
+	consoleSelect(topScreen);
+	
+	//sub bg
+	int sub_bg = bgInitSub(2, BgType_Bmp16, BgSize_B16_256x256, 2, 0);
+	bgSetPriority(sub_bg, 1);
+	decompress(drunkenlogoBitmap, (u16*)bgGetGfxPtr(sub_bg),  LZ77Vram);
+	
 	//BG drawing
-
 	int main_bg = bgInit(2, BgType_Bmp16, BgSize_B16_256x256, 2, 0);
 	bgSetPriority(main_bg, 1);
 
